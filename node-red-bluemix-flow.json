@@ -1,0 +1,189 @@
+[
+    {
+        "id": "161f0f72.4533f1",
+        "type": "ibmiot in",
+        "z": "3067cdfa.f839a2",
+        "authentication": "apiKey",
+        "apiKey": "5445506c.a473",
+        "inputType": "evt",
+        "deviceId": "",
+        "applicationId": "",
+        "deviceType": "chattydoor",
+        "eventType": "+",
+        "commandType": "",
+        "format": "json",
+        "name": "IBM IoT",
+        "service": "registered",
+        "allDevices": true,
+        "allApplications": "",
+        "allDeviceTypes": "",
+        "allEvents": true,
+        "allCommands": "",
+        "allFormats": "",
+        "x": 255.71432495117188,
+        "y": 198.5714111328125,
+        "wires": [
+            [
+                "f9031f82.a72c1"
+            ]
+        ]
+    },
+    {
+        "id": "f9031f82.a72c1",
+        "type": "switch",
+        "z": "3067cdfa.f839a2",
+        "name": "Check the door state",
+        "property": "payload.state",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1"
+            },
+            {
+                "t": "eq",
+                "v": "0"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 451.7143249511719,
+        "y": 197.5714111328125,
+        "wires": [
+            [
+                "1bba3ec3.bd6051"
+            ],
+            [
+                "e28a00ee.f57dd"
+            ]
+        ]
+    },
+    {
+        "id": "1bba3ec3.bd6051",
+        "type": "function",
+        "z": "3067cdfa.f839a2",
+        "name": "The door is open",
+        "func": "msg = {};\nmsg.payload = \"Hi folks! It is a pleasure to let you pass\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 657.7143249511719,
+        "y": 155.5714111328125,
+        "wires": [
+            [
+                "123ccb18.ba5c05"
+            ]
+        ]
+    },
+    {
+        "id": "e28a00ee.f57dd",
+        "type": "function",
+        "z": "3067cdfa.f839a2",
+        "name": "The door is closed",
+        "func": "msg = {};\nmsg.payload = \"Oh thank you! I did not like this draft\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 659.7143249511719,
+        "y": 228.5714111328125,
+        "wires": [
+            [
+                "123ccb18.ba5c05"
+            ]
+        ]
+    },
+    {
+        "id": "24afa8d7.d2bad8",
+        "type": "http in",
+        "z": "3067cdfa.f839a2",
+        "name": "",
+        "url": "/speech",
+        "method": "get",
+        "swaggerDoc": "",
+        "x": 267.96435546875,
+        "y": 346.8214111328125,
+        "wires": [
+            [
+                "2382f745.b6b7b8"
+            ]
+        ]
+    },
+    {
+        "id": "bbb9f45e.b2377",
+        "type": "http response",
+        "z": "3067cdfa.f839a2",
+        "name": "",
+        "x": 690.509843826294,
+        "y": 355.0941276550293,
+        "wires": []
+    },
+    {
+        "id": "2382f745.b6b7b8",
+        "type": "template",
+        "z": "3067cdfa.f839a2",
+        "name": "Html template for TTS",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html>\n<head>\n <title>The Chatty Door</title>\n <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js\"></script>\n \n <script type=\"text/javascript\">\n var socketaddy = \"ws://thechattydoor.mybluemix.net/ws/speech\";\n \n\n $(document).ready(function(){\n var output = document.getElementById('output')\n $('#output').on('playing', function () {\n $('#text').text('The door is chatting')\n \n });\n $('#output').on('ended', function () {\n\n $('#text').text('Waiting...');\n \n });\n \n sock = new WebSocket(socketaddy);\n sock.onopen = function(){\n $('#text').text('Waiting...');\n console.log(\"Connected websocket\");\n\n };\n sock.onerror = function(){ \n console.log(\"Websocket error\"); \n };\n sock.onclose = function () {\n $('#text').text('Not connected. Refresh the page?')\n }\n sock.onmessage = function(evt){\n console.log(\"Websocket message\", evt); \n output.src = window.URL.createObjectURL(evt.data);\n output.play();\n };\n });\n </script>\n \n</head>\n<body style=\"font-size: 56px; font-family: helvetica; text-align: center; margin-top: 100px;\">\n <div id=\"text\">Connecting...</div>\n <audio id=\"output\"></audio>\n</body>\n</html>",
+        "x": 480.96435546875,
+        "y": 353.8214111328125,
+        "wires": [
+            [
+                "bbb9f45e.b2377"
+            ]
+        ]
+    },
+    {
+        "id": "123ccb18.ba5c05",
+        "type": "watson-text-to-speech",
+        "z": "3067cdfa.f839a2",
+        "name": "Watson TTS",
+        "lang": "english",
+        "voice": "en-US_LisaVoice",
+        "x": 881.9643859863281,
+        "y": 191.0714111328125,
+        "wires": [
+            [
+                "ede3bf75.b2ab4"
+            ]
+        ]
+    },
+    {
+        "id": "8d99fdfa.e3c948",
+        "type": "websocket out",
+        "z": "3067cdfa.f839a2",
+        "name": "",
+        "server": "928732f3.25e71",
+        "client": "",
+        "x": 1350.357177734375,
+        "y": 193.5714111328125,
+        "wires": []
+    },
+    {
+        "id": "ede3bf75.b2ab4",
+        "type": "function",
+        "z": "3067cdfa.f839a2",
+        "name": "Prepare to send to Websocket",
+        "func": "msg.payload = msg.speech;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1099.4643249511719,
+        "y": 192.3214111328125,
+        "wires": [
+            [
+                "8d99fdfa.e3c948"
+            ]
+        ]
+    },
+    {
+        "id": "5445506c.a473",
+        "type": "ibmiot",
+        "z": "",
+        "name": ""
+    },
+    {
+        "id": "928732f3.25e71",
+        "type": "websocket-listener",
+        "z": "3067cdfa.f839a2",
+        "path": "/ws/speech",
+        "wholemsg": "false"
+    }
+]
